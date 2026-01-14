@@ -26,8 +26,11 @@ struct Camera_settings
 // Default camera values
 const double YAW = -90.0f;
 const double PITCH = 0.0f;
-const double SPEED = 2.5f;
+//Movement speed
+const double SPEED = 15.0f;
+//Camera sensitivity
 const double SENSITIVITY = 0.1f;
+//FOV
 const double ZOOM = 45.0f;
 
 // Camera class
@@ -51,6 +54,7 @@ private:
 	double Zoom;
 	double NearPlane;
 	double FarPlane;
+	double runSpeed = 1.0;
 
 	// Screen options
 	unsigned int ScreenWidth;
@@ -93,6 +97,8 @@ public:
 
 	// Updates the screen width and height data to return correct view matrix if screen size has changed
 	void updateScreenSize(double width, double height);
+
+	void setRunSpeed(double speed);
 };
 
 #endif

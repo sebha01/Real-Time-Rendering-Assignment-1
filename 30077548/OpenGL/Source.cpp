@@ -116,7 +116,7 @@ int main()
 	
 
 		// Clear the screen
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -140,7 +140,7 @@ int main()
 		"Anisotropic filtering 2x",
 		"Anisotropic filtering 8x",
 		"Anisotropic filtering 16x" };
-		textRenderer.renderText(filterStrings[currentRoad], 25.0f, 25.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+		textRenderer.renderText(filterStrings[currentRoad], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
 
 		// glfw: swap buffers and poll events
 		glfwSwapBuffers(window);
@@ -168,6 +168,10 @@ void processInput(GLFWwindow *window)
 		camera.processKeyboard(LEFT, timer.getDeltaTimeSeconds());
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.processKeyboard(RIGHT, timer.getDeltaTimeSeconds());
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		camera.setRunSpeed(2.0);
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
+		camera.setRunSpeed(1.0);
 
 	//Switch the texture filter modes
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)

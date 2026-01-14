@@ -98,7 +98,7 @@ glm::vec3 Camera::getCameraPosition()
 // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
 void Camera::processKeyboard(Camera_Movement direction, double deltaTime)
 {
-	float velocity = static_cast<float>(this->MovementSpeed * deltaTime);
+	float velocity = static_cast<float>(this->MovementSpeed * runSpeed * deltaTime);
 	if (direction == FORWARD)
 		this->Position += this->Target * velocity;
 	if (direction == BACKWARD)
@@ -161,4 +161,9 @@ void Camera::updateCameraVectors()
 	// Also re-calculate the Right and Up vector
 	this->Right = glm::normalize(glm::cross(this->Target, this->WorldUp));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
 	this->Up = glm::normalize(glm::cross(this->Right, this->Target));
+}
+
+void Camera::setRunSpeed(double speed)
+{
+	this->runSpeed = speed;
 }

@@ -20,7 +20,7 @@ Camera camera(camera_settings, glm::vec3(0.0f, 4.0f, 60.0f));
 double lastX = camera_settings.screenWidth / 2.0f;
 double lastY = camera_settings.screenHeight / 2.0f;
 
-int	currentRoad;
+int	currentAntiAliasingFilter = 0;
 
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
@@ -80,31 +80,12 @@ int main()
 
 	////	Shaders - Textures - Models	////
 
-	static const GLuint	NUM_ROADS = 6;
-	TexturedQuad	*road[NUM_ROADS];
+
 
 	//
 	// Load example road texture with different filtering properites
 
-	// Point filtering
-	road[0] = new TexturedQuad("Resources\\Models\\road.bmp", TextureGenProperties(GL_COMPRESSED_SRGB, GL_NEAREST, GL_NEAREST, 1.0f, GL_REPEAT, GL_REPEAT, true));
-
-	// Bilinear filtering
-	road[1] = new TexturedQuad("Resources\\Models\\road.bmp", TextureGenProperties(GL_SRGB8_ALPHA8, GL_LINEAR, GL_LINEAR, 1.0f, GL_REPEAT, GL_REPEAT, true));
-
-	// Tri-linear filtering
-	road[2] = new TexturedQuad("Resources\\Models\\road.bmp", TextureGenProperties(GL_SRGB8_ALPHA8, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, 1.0f, GL_REPEAT, GL_REPEAT, true));
-
-	// Anisotropic x2
-	road[3] = new TexturedQuad("Resources\\Models\\road.bmp", TextureGenProperties(GL_SRGB8_ALPHA8, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, 2.0f, GL_REPEAT, GL_REPEAT, true));
-
-	// Anisotropic x8
-	road[4] = new TexturedQuad("Resources\\Models\\road.bmp", TextureGenProperties(GL_SRGB8_ALPHA8, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, 8.0f, GL_REPEAT, GL_REPEAT, true));
-
-	// Anisotropic x16
-	road[5] = new TexturedQuad("Resources\\Models\\road.bmp", TextureGenProperties(GL_SRGB8_ALPHA8, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR, 16.0f, GL_REPEAT, GL_REPEAT, true));
-
-	currentRoad = 0;
+	currentAntiAliasingFilter = 0;
 
 
 	// render loop
@@ -131,16 +112,16 @@ int main()
 
 		glm::mat4 roadMVP = viewProjection * model;
 
-		road[currentRoad]->render(roadMVP);
+		//render
 
 		static const char *filterStrings[] = {
-		"Point filtering",
-		"Bi-linear filtering",
-		"Tri-linear filtering",
-		"Anisotropic filtering 2x",
-		"Anisotropic filtering 8x",
-		"Anisotropic filtering 16x" };
-		textRenderer.renderText(filterStrings[currentRoad], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+		"No Anti-Aliasing",
+		"Multi-Sample Anti-Aliasing",
+		"Super-Sample Anti-Aliasing",
+		"",
+		"",
+		"" };
+		textRenderer.renderText(filterStrings[currentAntiAliasingFilter], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
 
 		// glfw: swap buffers and poll events
 		glfwSwapBuffers(window);
@@ -174,18 +155,18 @@ void processInput(GLFWwindow *window)
 		camera.setRunSpeed(1.0);
 
 	//Switch the texture filter modes
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		currentRoad = 0;	
+	/*if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		currentAntiAliasingFilter = 0;
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		currentRoad = 1;
+		currentAntiAliasingFilter = 1;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-		currentRoad = 2;
+		currentAntiAliasingFilter = 2;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-		currentRoad = 3;
+		currentAntiAliasingFilter = 3;
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-		currentRoad = 4;
+		currentAntiAliasingFilter = 4;
 	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
-		currentRoad = 5;
+		currentAntiAliasingFilter = 5;*/
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

@@ -25,6 +25,9 @@ int	currentAntiAliasingFilter = 0;
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
 
+//Models
+Model rubiksCube;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -80,7 +83,12 @@ int main()
 
 	////	Shaders - Textures - Models	////
 
-
+	GLuint sceneShader;
+	
+	GLSL_ERROR glsl_err = ShaderLoader::createShaderProgram(
+		string("Resources\\Shaders\\Phong-texture.vs"),
+		string("Resources\\Shaders\\Phong-texture.fs"),
+		&sceneShader);
 
 	//
 	// Load example road texture with different filtering properites

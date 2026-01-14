@@ -25,9 +25,6 @@ int	currentAntiAliasingFilter = 0;
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
 
-//Models
-Model rubiksCube;
-
 int main()
 {
 	// glfw: initialize and configure
@@ -90,11 +87,26 @@ int main()
 		string("Resources\\Shaders\\Phong-texture.fs"),
 		&sceneShader);
 
-	//
-	// Load example road texture with different filtering properites
-
+	Model *rubiksCube = new Model("Resources\\Models\\Rubik's_cube\\rubik_cube.obj");
+	GLuint cubeTexture = TextureLoader::loadTexture(string("Resources\\Models\\Rubik's_cube\\rubik_cube.mtl"));
+	
 	currentAntiAliasingFilter = 0;
 
+	//Setup uniform locations for shader
+
+	// Setup uniform locations for shader
+	GLuint textureUniformLoc = glGetUniformLocation(sceneShader, "texture");
+
+	GLint modelMatrixLocation = glGetUniformLocation(sceneShader, "modelMatrix");
+	GLint viewProjectionMatrixLocation = glGetUniformLocation(sceneShader, "viewProjectionMatrix");
+	GLint invTransposeMatrixLocation = glGetUniformLocation(sceneShader, "invTransposeModelMatrix");
+
+	GLint lightDirectionLocation = glGetUniformLocation(sceneShader, "lightDirection");
+	GLint lightDiffuseLocation = glGetUniformLocation(sceneShader, "lightDiffuseColour");
+	GLint lightSpecularLocation = glGetUniformLocation(sceneShader, "lightSpecularColour");
+	GLint lightSpecExpLocation = glGetUniformLocation(sceneShader, "lightSpecularExponent");
+
+	GLint cameraPosLocation = glGetUniformLocation(sceneShader, "cameraPos");
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -109,18 +121,45 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-		glm::mat4 model = glm::rotate(glm::mat4(1.0), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-		model = glm::scale(model, glm::vec3(16.0f, 64.0f, 1.0f));
-		model = glm::translate(model, glm::vec3(-1.0f, -1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 1.0f));
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 20.0f));
+		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(10.0f));
 
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix();
 		glm::mat4 viewProjection = projection * view;
 
-		glm::mat4 roadMVP = viewProjection * model;
+		principleAxes->render(viewProjection);
 
 		//render
+		if (rubiksCube)
+		{
+			// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
+			glm::mat4 inverseTranspose = glm::transpose(glm::inverse(model));;
+
+			glUseProgram(sceneShader);
+
+			// Get the location of the camera in world coords and set the corresponding uniform in the shader
+			glm::vec3 cameraPos = camera.getCameraPosition();
+			glUniform3fv(cameraPosLocation, 1, (GLfloat*)&cameraPos);
+
+			// Set the model, view and projection matrix uniforms (from the camera data obtained above)
+			glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(model));
+			glUniformMatrix4fv(invTransposeMatrixLocation, 1, GL_FALSE, glm::value_ptr(inverseTranspose));
+			glUniformMatrix4fv(viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewProjection));
+
+			glUniform4f(lightDirectionLocation, 1.0f, 0.0f, 0.0f, 0.0f); // world coordinate space vector
+			glUniform4f(lightDiffuseLocation, 1.0f, 1.0f, 1.0f, 1.0f); // white diffuse light
+			glUniform4f(lightSpecularLocation, 0.5f, 0.5f, 0.5f, 1.0f); // white specular light
+			glUniform1f(lightSpecExpLocation, 10.0f); // specular exponent / falloff
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, cubeTexture);
+
+			rubiksCube->draw(sceneShader);
+		}
+		
 
 		static const char *filterStrings[] = {
 		"No Anti-Aliasing",

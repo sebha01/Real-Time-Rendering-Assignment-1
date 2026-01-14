@@ -22,6 +22,9 @@ double lastY = camera_settings.screenHeight / 2.0f;
 
 int	currentRoad;
 
+//Boolean to capture first mouse input to prevent snapback bug
+bool firstMouseInput = false;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -48,7 +51,9 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);
 
 	// tell GLFW to capture our mouse
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//Set firstMouseInput to true so camera does not snap to mouse position
+	firstMouseInput = true;
 
 	// glad: load all OpenGL function pointers
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -190,16 +195,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // glfw: whenever the mouse moves, this callback is called
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
+	//Ensure that camera does not snap due to the initial large offset of where lastX and 
+	// lastY have not yet matched the mouse position the first time the mousecallback 
+	// function is called
+	if (firstMouseInput) 
+	{ 
+		lastX = xpos; 
+		lastY = ypos; 
+		firstMouseInput = false; 
+	}
+
 	double xoffset = xpos - lastX;
 	double yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
 	lastX = xpos;
 	lastY = ypos;
 
-	 if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
-	{
-		camera.processMouseMovement(xoffset, yoffset);
-	}
+	camera.processMouseMovement(xoffset, yoffset);
 }
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called

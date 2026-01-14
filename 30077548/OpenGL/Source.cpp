@@ -116,7 +116,7 @@ int main()
 	
 
 		// Clear the screen
-		glClearColor(0.5f, 0.5f, 0.8f, 1.0f);
+		glClearColor(0.1f, 0.2f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
@@ -169,7 +169,7 @@ void processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.processKeyboard(RIGHT, timer.getDeltaTimeSeconds());
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.setRunSpeed(2.0);
+		camera.setRunSpeed(3.0);
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 		camera.setRunSpeed(1.0);
 

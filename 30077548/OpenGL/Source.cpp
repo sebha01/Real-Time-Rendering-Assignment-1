@@ -25,6 +25,8 @@ int	currentAntiAliasingFilter = 0;
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
 
+Sphere* moonModel = nullptr;
+
 int main()
 {
 	// glfw: initialize and configure
@@ -66,7 +68,7 @@ int main()
 	glfwSwapInterval(1);		// glfw enable swap interval to match screen v-sync
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE); //Enables face culling
-	glFrontFace(GL_CCW);//Specifies which winding order if front facing
+	//glFrontFace(GL_CCW);//Specifies which winding order if front facing
 	glEnable(GL_BLEND);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -87,10 +89,10 @@ int main()
 		string("Resources\\Shaders\\Phong-texture.fs"),
 		&sceneShader);
 
-	Model *rubiksCube = new Model("Resources\\Models\\Cube\\Rubik Cube.obj");
-	GLuint rubikTexture = TextureLoader::loadTexture(string("Resources\\Models\\Cube Textures\\Robot-Skin.jpg"));
-
-	Model *moonModel = new Model("Resources\\Models\\Moon_obj\\Moon.obj");
+	Model *grass = new Model("Resources\\Models\\Grass\\grass.obj");
+	GLuint grassTexture = TextureLoader::loadTexture(string("Resources\\Models\\Grass\\grassTexture.jpg"));
+	
+	moonModel = new Sphere(32, 16, 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), CG_RIGHTHANDED);
 	GLuint moonTexture = TextureLoader::loadTexture(string("Resources\\Models\\Moon_Textures\\Moon_Diffuse.jpg"));
 	
 	currentAntiAliasingFilter = 0;
@@ -125,9 +127,9 @@ int main()
 
 
 		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 20.0f));
-		model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(10.0f));
+		model = glm::translate(model, glm::vec3(-10.0f, -10.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.1f));
 
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix();
@@ -136,7 +138,7 @@ int main()
 		principleAxes->render(viewProjection);
 
 		//render
-		if (rubiksCube)
+		if (grass)
 		{
 			// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
 			glm::mat4 inverseTranspose = glm::transpose(glm::inverse(model));
@@ -160,9 +162,9 @@ int main()
 			glUniform1i(glGetUniformLocation(sceneShader, "texture0"), 0);
 
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, rubikTexture);
+			glBindTexture(GL_TEXTURE_2D, grassTexture);
 
-			rubiksCube->draw(sceneShader);
+			grass->draw(sceneShader);
 
 			glUseProgram(0);
 		}
@@ -170,7 +172,7 @@ int main()
 		glm::mat4 moon(1.0f);
 		moon = glm::translate(moon, glm::vec3(20.0f, 0.0f, -15.0f));
 		moon = glm::rotate(moon, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		moon = glm::scale(moon, glm::vec3(0.1f));
+		moon = glm::scale(moon, glm::vec3(10.0f));
 
 		if (moonModel)
 		{
@@ -200,13 +202,12 @@ int main()
 			glUniform4f(lightSpecularLocation, 0.5f, 0.5f, 0.5f, 1.0f); // white specular light
 			glUniform1f(lightSpecExpLocation, 10.0f); // specular exponent / falloff
 
-			glUniform1i(glGetUniformLocation(sceneShader, "texture0"), 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, moonTexture);
 
-			//glDisable(GL_CULL_FACE);
-			moonModel->draw(sceneShader);
-			//glEnable(GL_CULL_FACE);
+			moonModel->render();
+
+			glUseProgram(0);
 		}
 		
 

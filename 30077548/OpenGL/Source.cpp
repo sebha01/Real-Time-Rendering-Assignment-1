@@ -67,9 +67,6 @@ int main()
 	//Rendering settings
 	glfwSwapInterval(1);		// glfw enable swap interval to match screen v-sync
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE); //Enables face culling
-	//glFrontFace(GL_CCW);//Specifies which winding order if front facing
-	//glEnable(GL_BLEND);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

@@ -102,6 +102,11 @@ int main()
 	GLuint grassTexture = TextureLoader::loadTexture(string("Resources\\Models\\Grass\\grassTexture.jpg"));
 	grass.attachTexture(grassTexture);
 
+	//Rubik's cube
+	Model rubik("Resources\\Models\\Cube\\Rubik Cube.obj");
+	GLuint rubikTexture = TextureLoader::loadTexture(string("Resources\\Models\\Cube Textures\\Robot-Skin.jpg"));
+	rubik.attachTexture(rubikTexture);
+
 	//Moon
 	moonModel = new Sphere(32, 16, 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), CG_RIGHTHANDED);
 	GLuint moonTexture = TextureLoader::loadTexture(string("Resources\\Models\\Moon_Textures\\Moon_Diffuse.jpg"));
@@ -167,28 +172,28 @@ int main()
 		// input
 		processInput(window);
 		timer.tick();
-	
 
 		// Clear the screen
 		glClearColor(0.1f, 0.2f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 grassModel = glm::mat4(1.0);
-		grassModel = glm::translate(grassModel, glm::vec3(-10.0f, -10.0f, 0.0f));
-		grassModel = glm::rotate(grassModel, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		grassModel = glm::scale(grassModel, glm::vec3(0.1f));
-
+		glm::mat4 rubikModel = glm::mat4(1.0);
+		glm::mat4 moon(1.0f);
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix();
 		glm::mat4 viewProjection = projection * view;
 		
+		glm::vec3 eyePos = camera.getCameraPosition();
 
 		principleAxes->render(viewProjection);
 
-		//render
-		// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
-
-		glm::vec3 eyePos = camera.getCameraPosition();
+		/////////////////////
+		//RENDER THE GRASS
+		/////////////////////
+		grassModel = glm::translate(grassModel, glm::vec3(-10.0f, -10.0f, 0.0f));
+		grassModel = glm::rotate(grassModel, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		grassModel = glm::scale(grassModel, glm::vec3(0.1f));
 
 		glUseProgram(basicShader);
 
@@ -212,10 +217,20 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(basicShader, "model"), 1, GL_FALSE, glm::value_ptr(grassModel));
 		grass.draw(basicShader); //Draw the plane
 
+		//////////////////
+		// RUBIK CUBE
+		//////////////////
+		rubikModel = glm::translate(rubikModel, glm::vec3(-10.0f, 0.0f, 0.0f));
+		//grassModel = glm::rotate(grassModel, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		rubikModel = glm::scale(rubikModel, glm::vec3(20.0f));
+
+		glUniformMatrix4fv(glGetUniformLocation(basicShader, "model"), 1, GL_FALSE, glm::value_ptr(rubikModel));
+		rubik.draw(basicShader);
+		
+		
 		glUseProgram(0);
 
 		
-		glm::mat4 moon(1.0f);
 		moon = glm::translate(moon, glm::vec3(20.0f, 0.0f, -15.0f));
 		moon = glm::rotate(moon, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		moon = glm::scale(moon, glm::vec3(10.0f));

@@ -137,6 +137,14 @@ int main()
 
 		principleAxes->render(viewProjection);
 
+		//////////////////////////////////////////////////////////////////////
+		// RENDER CUBE ASWELL, SWITCH CUBE AND GRASS SHADERS TO ONE I USED IN 
+		// YEAR 2 ASSIGNMENT
+		// MOVE ONTO NEXT PART
+		// DON'T OVERCOMPLICATE IT	
+		//////////////////////////////////////////////////////////////////////
+
+
 		//render
 		if (grass)
 		{

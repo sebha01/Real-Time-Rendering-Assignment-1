@@ -157,6 +157,8 @@
     <ClInclude Include="VertexData.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Shaders\Basic_shader.frag" />
+    <None Include="Resources\Shaders\Basic_shader.vert" />
     <None Include="Resources\Shaders\Phong-texture.fs" />
     <None Include="Resources\Shaders\Phong-texture.vs" />
   </ItemGroup>

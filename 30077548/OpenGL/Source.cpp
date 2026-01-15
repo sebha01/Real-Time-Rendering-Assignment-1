@@ -69,7 +69,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 	//glEnable(GL_CULL_FACE); //Enables face culling
 	//glFrontFace(GL_CCW);//Specifies which winding order if front facing
-	glEnable(GL_BLEND);
+	//glEnable(GL_BLEND);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -82,36 +82,84 @@ int main()
 
 	////	Shaders - Textures - Models	////
 
-	GLuint sceneShader;
+	GLuint phongShader;
+	GLuint basicShader;
 	
+	//phong shader
 	GLSL_ERROR glsl_err = ShaderLoader::createShaderProgram(
 		string("Resources\\Shaders\\Phong-texture.vs"),
 		string("Resources\\Shaders\\Phong-texture.fs"),
-		&sceneShader);
+		&phongShader);
 
-	Model *grass = new Model("Resources\\Models\\Grass\\grass.obj");
+	//basic shader
+	glsl_err = ShaderLoader::createShaderProgram(
+		string("Resources\\Shaders\\Basic_shader.vert"),
+		string("Resources\\Shaders\\Basic_shader.frag"),
+		&basicShader);
+
+	//Grass
+	Model grass("Resources\\Models\\Grass\\grass.obj");
 	GLuint grassTexture = TextureLoader::loadTexture(string("Resources\\Models\\Grass\\grassTexture.jpg"));
-	
+	grass.attachTexture(grassTexture);
+
+	//Moon
 	moonModel = new Sphere(32, 16, 1.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), CG_RIGHTHANDED);
 	GLuint moonTexture = TextureLoader::loadTexture(string("Resources\\Models\\Moon_Textures\\Moon_Diffuse.jpg"));
 	
 	currentAntiAliasingFilter = 0;
 
+	//Light Data///////////////////////////////////////////////
+	// Lights
+	GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };	// Dim light 
+	GLfloat light_diffusers[] = {
+		1.0, 0.0, 0.0, 1.0, // Red
+		0.0, 1.0, 0.0, 1.0, // Green
+		1.0, 1.0, 0.0, 1.0, //Yellow
+		0.0, 0.0, 1.0, 1.0, //Blue
+		1.0, 1.0, 1.0, 1.0 //White light above tower
+	};	// White main light 
+	GLfloat light_positions[] = {
+		27.0, 5.0, 18.0, 1.0, //Red Light
+		-27.0, 5.0, 18.0, 1.0, //Green
+		-27.0, 5.0, -18.0, 1.0, //Yellow
+		27.0, 5.0, -18.0, 1.0, // Blue
+		0.0, 25.0, 0.0, 1.0 // White light above tower
+	};	// Point light (w=1.0)
+	GLfloat	attenuation[] = { 1.0, 0.10, 0.08 };
+
+	// Materials
+	GLfloat mat_amb_diff[] = { 1.0, 1.0, 1.0, 1.0 };	// Texture map will provide ambient and diffuse.
+	GLfloat mat_specularCol[] = { 1.0, 1.0, 1.0, 1.0 }; // White highlight
+	GLfloat mat_specularExp = 32.0;					// Shiny surface
+
 	//Setup uniform locations for shader
+	GLuint textureUniformLoc = glGetUniformLocation(phongShader, "texture");
 
-	// Setup uniform locations for shader
-	GLuint textureUniformLoc = glGetUniformLocation(sceneShader, "texture");
+	GLint modelMatrixLocation = glGetUniformLocation(phongShader, "modelMatrix");
+	GLint viewProjectionMatrixLocation = glGetUniformLocation(phongShader, "viewProjectionMatrix");
+	GLint invTransposeMatrixLocation = glGetUniformLocation(phongShader, "invTransposeModelMatrix");
 
-	GLint modelMatrixLocation = glGetUniformLocation(sceneShader, "modelMatrix");
-	GLint viewProjectionMatrixLocation = glGetUniformLocation(sceneShader, "viewProjectionMatrix");
-	GLint invTransposeMatrixLocation = glGetUniformLocation(sceneShader, "invTransposeModelMatrix");
+	GLint lightDirectionLocation = glGetUniformLocation(phongShader, "lightDirection");
+	GLint lightDiffuseLocation = glGetUniformLocation(phongShader, "lightDiffuseColour");
+	GLint lightSpecularLocation = glGetUniformLocation(phongShader, "lightSpecularColour");
+	GLint lightSpecExpLocation = glGetUniformLocation(phongShader, "lightSpecularExponent");
 
-	GLint lightDirectionLocation = glGetUniformLocation(sceneShader, "lightDirection");
-	GLint lightDiffuseLocation = glGetUniformLocation(sceneShader, "lightDiffuseColour");
-	GLint lightSpecularLocation = glGetUniformLocation(sceneShader, "lightSpecularColour");
-	GLint lightSpecExpLocation = glGetUniformLocation(sceneShader, "lightSpecularExponent");
+	GLint cameraPosLocation = glGetUniformLocation(phongShader, "cameraPos");
 
-	GLint cameraPosLocation = glGetUniformLocation(sceneShader, "cameraPos");
+	//Uniform Locations - Basic Shader////////////////////////////////////////////
+	// Get unifom locations in shader
+	GLuint uLightAmbient = glGetUniformLocation(basicShader, "lightAmbient");
+	GLuint uLightDiffusers = glGetUniformLocation(basicShader, "lightDiffusers");
+	GLuint uLightAttenuation = glGetUniformLocation(basicShader, "lightAttenuation");
+	GLuint uLightPositions = glGetUniformLocation(basicShader, "lightPositions");
+	GLuint uEyePos = glGetUniformLocation(basicShader, "eyePos");
+
+	// Get material unifom locations in shader
+	GLuint uMatAmbient = glGetUniformLocation(basicShader, "matAmbient");
+	GLuint uMatDiffuse = glGetUniformLocation(basicShader, "matDiffuse");
+	GLuint uMatSpecularCol = glGetUniformLocation(basicShader, "matSpecularColour");
+	GLuint uMatSpecularExp = glGetUniformLocation(basicShader, "matSpecularExponent");
+
 
 	// render loop
 	while (!glfwWindowShouldClose(window))
@@ -125,57 +173,47 @@ int main()
 		glClearColor(0.1f, 0.2f, 0.8f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(-10.0f, -10.0f, 0.0f));
-		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.1f));
+		glm::mat4 grassModel = glm::mat4(1.0);
+		grassModel = glm::translate(grassModel, glm::vec3(-10.0f, -10.0f, 0.0f));
+		grassModel = glm::rotate(grassModel, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		grassModel = glm::scale(grassModel, glm::vec3(0.1f));
 
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = camera.getProjectionMatrix();
 		glm::mat4 viewProjection = projection * view;
+		
 
 		principleAxes->render(viewProjection);
 
-		//////////////////////////////////////////////////////////////////////
-		// RENDER CUBE ASWELL, SWITCH CUBE AND GRASS SHADERS TO ONE I USED IN 
-		// YEAR 2 ASSIGNMENT
-		// MOVE ONTO NEXT PART
-		// DON'T OVERCOMPLICATE IT	
-		//////////////////////////////////////////////////////////////////////
-
-
 		//render
-		if (grass)
-		{
-			// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
-			glm::mat4 inverseTranspose = glm::transpose(glm::inverse(model));
+		// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
 
-			glUseProgram(sceneShader);
+		glm::vec3 eyePos = camera.getCameraPosition();
 
-			// Get the location of the camera in world coords and set the corresponding uniform in the shader
-			glm::vec3 cameraPos = camera.getCameraPosition();
-			glUniform3fv(cameraPosLocation, 1, (GLfloat*)&cameraPos);
+		glUseProgram(basicShader);
 
-			// Set the model, view and projection matrix uniforms (from the camera data obtained above)
-			glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(model));
-			glUniformMatrix4fv(invTransposeMatrixLocation, 1, GL_FALSE, glm::value_ptr(inverseTranspose));
-			glUniformMatrix4fv(viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewProjection));
+		glUniform4fv(uLightDiffusers, 5, (GLfloat*)&light_diffusers);
+		glUniform4fv(uLightAmbient, 1, (GLfloat*)&light_ambient);
+		glUniform4fv(uLightPositions, 5, (GLfloat*)&light_positions);
+		glUniform3fv(uLightAttenuation, 1, (GLfloat*)&attenuation);
+		glUniform3fv(uEyePos, 1, (GLfloat*)&eyePos);
 
-			glUniform4f(lightDirectionLocation, 1.0f, 0.0f, 0.0f, 0.0f); // world coordinate space vector
-			glUniform4f(lightDiffuseLocation, 1.0f, 1.0f, 1.0f, 1.0f); // white diffuse light
-			glUniform4f(lightSpecularLocation, 0.5f, 0.5f, 0.5f, 1.0f); // white specular light
-			glUniform1f(lightSpecExpLocation, 10.0f); // specular exponent / falloff
 
-			glUniform1i(glGetUniformLocation(sceneShader, "texture0"), 0);
+		//Pass material data
+		glUniform4fv(uMatAmbient, 1, (GLfloat*)&mat_amb_diff);
+		glUniform4fv(uMatDiffuse, 1, (GLfloat*)&mat_amb_diff);
+		glUniform4fv(uMatSpecularCol, 1, (GLfloat*)&mat_specularCol);
+		glUniform1f(uMatSpecularExp, mat_specularExp);
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, grassTexture);
+		glUniformMatrix4fv(glGetUniformLocation(basicShader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(basicShader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-			grass->draw(sceneShader);
+		//Drawing the objects
+		glUniformMatrix4fv(glGetUniformLocation(basicShader, "model"), 1, GL_FALSE, glm::value_ptr(grassModel));
+		grass.draw(basicShader); //Draw the plane
 
-			glUseProgram(0);
-		}
+		glUseProgram(0);
+
 		
 		glm::mat4 moon(1.0f);
 		moon = glm::translate(moon, glm::vec3(20.0f, 0.0f, -15.0f));
@@ -191,7 +229,7 @@ int main()
 			// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
 			glm::mat4 invT = glm::transpose(glm::inverse(moon));;
 
-			glUseProgram(sceneShader);
+			glUseProgram(phongShader);
 
 			//// Get the location of the camera in world coords and set the corresponding uniform in the shader
 			glm::vec3 cameraPos = camera.getCameraPosition();

@@ -48,3 +48,4 @@ void main(void) {
 	// vertex position in clip coords - necessary for pipeline
 	gl_Position = viewProjectionMatrix * modelMatrix * vertexPos;
 }
+       

@@ -9,7 +9,7 @@ void processInput(GLFWwindow *window);
 
 // Camera settings
 //							  width, heigh, near plane, far plane
-Camera_settings camera_settings{ 1500, 1200, 0.1, 150.0 };
+Camera_settings camera_settings{ 1500, 1200, 0.1, 1500.0 };
 
 //Timer
 Timer timer;
@@ -65,7 +65,7 @@ int main()
 	//Rendering settings
 	glfwSwapInterval(1);		// glfw enable swap interval to match screen v-sync
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE); //Enables face culling
+	//glEnable(GL_CULL_FACE); //Enables face culling
 	glFrontFace(GL_CCW);//Specifies which winding order if front facing
 	glEnable(GL_BLEND);
 	glEnable(GL_FRAMEBUFFER_SRGB);
@@ -87,8 +87,11 @@ int main()
 		string("Resources\\Shaders\\Phong-texture.fs"),
 		&sceneShader);
 
-	Model *rubiksCube = new Model("Resources\\Models\\Rubik's_cube\\rubik_cube.obj");
-	GLuint cubeTexture = TextureLoader::loadTexture(string("Resources\\Models\\Rubik's_cube\\rubik_cube.mtl"));
+	Model *rubiksCube = new Model("Resources\\Models\\Cube\\Rubik Cube.obj");
+	GLuint rubikTexture = TextureLoader::loadTexture(string("Resources\\Models\\Cube Textures\\Robot-Skin.jpg"));
+
+	Model *moonModel = new Model("Resources\\Models\\Moon_obj\\Moon.obj");
+	GLuint moonTexture = TextureLoader::loadTexture(string("Resources\\Models\\Moon_Textures\\Moon_Diffuse.jpg"));
 	
 	currentAntiAliasingFilter = 0;
 
@@ -136,7 +139,7 @@ int main()
 		if (rubiksCube)
 		{
 			// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
-			glm::mat4 inverseTranspose = glm::transpose(glm::inverse(model));;
+			glm::mat4 inverseTranspose = glm::transpose(glm::inverse(model));
 
 			glUseProgram(sceneShader);
 
@@ -154,10 +157,56 @@ int main()
 			glUniform4f(lightSpecularLocation, 0.5f, 0.5f, 0.5f, 1.0f); // white specular light
 			glUniform1f(lightSpecExpLocation, 10.0f); // specular exponent / falloff
 
+			glUniform1i(glGetUniformLocation(sceneShader, "texture0"), 0);
+
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, cubeTexture);
+			glBindTexture(GL_TEXTURE_2D, rubikTexture);
 
 			rubiksCube->draw(sceneShader);
+
+			glUseProgram(0);
+		}
+		
+		glm::mat4 moon(1.0f);
+		moon = glm::translate(moon, glm::vec3(20.0f, 0.0f, -15.0f));
+		moon = glm::rotate(moon, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		moon = glm::scale(moon, glm::vec3(0.1f));
+
+		if (moonModel)
+		{
+			// Modelling transform
+			//glm::mat4 modelTransform = glm::rotate(glm::mat4(1.0), glm::radians(23.44f), glm::vec3(0.0, 0.0, 1.0));//Earth tilt
+			//modelTransform = glm::rotate(modelTransform, glm::radians(earthTheta), glm::vec3(0.0, 1.0, 0.0));//Earth rotation
+
+			// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
+			glm::mat4 invT = glm::transpose(glm::inverse(moon));;
+
+			glUseProgram(sceneShader);
+
+			//// Get the location of the camera in world coords and set the corresponding uniform in the shader
+			glm::vec3 cameraPos = camera.getCameraPosition();
+			glUniform3fv(cameraPosLocation, 1, (GLfloat*)&cameraPos);
+
+			// Set the model, view and projection matrix uniforms (from the camera data obtained above)
+			glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, glm::value_ptr(moon));
+			glUniformMatrix4fv(invTransposeMatrixLocation, 1, GL_FALSE, glm::value_ptr(invT));
+			glUniformMatrix4fv(viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewProjection));
+
+			//// Set the light direction uniform vector in world coordinates based on the Sun's position
+			//glUniform4f(lightDirectionLocation, cosf(glm::radians(sunTheta)), 0.0f, sinf(glm::radians(sunTheta)), 0.0f);
+
+			glUniform4f(lightDirectionLocation, 1.0f, 0.0f, 0.0f, 0.0f); // world coordinate space vector
+			glUniform4f(lightDiffuseLocation, 1.0f, 1.0f, 1.0f, 1.0f); // white diffuse light
+			glUniform4f(lightSpecularLocation, 0.5f, 0.5f, 0.5f, 1.0f); // white specular light
+			glUniform1f(lightSpecExpLocation, 10.0f); // specular exponent / falloff
+
+			glUniform1i(glGetUniformLocation(sceneShader, "texture0"), 0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, moonTexture);
+
+			//glDisable(GL_CULL_FACE);
+			moonModel->draw(sceneShader);
+			//glEnable(GL_CULL_FACE);
 		}
 		
 

@@ -26,6 +26,8 @@ int	currentAntiAliasingFilter = 0;
 bool firstMouseInput = false;
 
 Sphere* moonModel = nullptr;
+float moonTheta = 0.0f;
+float sunTheta = 0.0f;
 
 int main()
 {
@@ -54,6 +56,7 @@ int main()
 
 	// tell GLFW to capture our mouse
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 	//Set firstMouseInput to true so camera does not snap to mouse position
 	firstMouseInput = true;
 
@@ -77,18 +80,19 @@ int main()
 
 	PrincipleAxes	*principleAxes = new PrincipleAxes();
 
+	///////////////////////////////////////////////////////////////////////////
 	////	Shaders - Textures - Models	////
 
 	GLuint phongShader;
 	GLuint basicShader;
 	
-	//phong shader
+	//PHONG SHADER
 	GLSL_ERROR glsl_err = ShaderLoader::createShaderProgram(
 		string("Resources\\Shaders\\Phong-texture.vs"),
 		string("Resources\\Shaders\\Phong-texture.fs"),
 		&phongShader);
 
-	//basic shader
+	//BASIC SHADER
 	glsl_err = ShaderLoader::createShaderProgram(
 		string("Resources\\Shaders\\Basic_shader.vert"),
 		string("Resources\\Shaders\\Basic_shader.frag"),
@@ -109,7 +113,9 @@ int main()
 	GLuint moonTexture = TextureLoader::loadTexture(string("Resources\\Models\\Moon_Textures\\Moon_Diffuse.jpg"));
 	
 	currentAntiAliasingFilter = 0;
+	///////////////////////////////////////////////////////////////////////////
 
+	///////////////////////////////////////////////////////////////////////////
 	//Light Data///////////////////////////////////////////////
 	// Lights
 	GLfloat light_ambient[] = { 1.0, 1.0, 1.0, 1.0 };	// Dim light 
@@ -147,7 +153,9 @@ int main()
 	GLint lightSpecExpLocation = glGetUniformLocation(phongShader, "lightSpecularExponent");
 
 	GLint cameraPosLocation = glGetUniformLocation(phongShader, "cameraPos");
+	///////////////////////////////////////////////////////////////////////////
 
+	///////////////////////////////////////////////////////////////////////////
 	//Uniform Locations - Basic Shader////////////////////////////////////////////
 	// Get unifom locations in shader
 	GLuint uLightAmbient = glGetUniformLocation(basicShader, "lightAmbient");
@@ -161,8 +169,9 @@ int main()
 	GLuint uMatDiffuse = glGetUniformLocation(basicShader, "matDiffuse");
 	GLuint uMatSpecularCol = glGetUniformLocation(basicShader, "matSpecularColour");
 	GLuint uMatSpecularExp = glGetUniformLocation(basicShader, "matSpecularExponent");
+	///////////////////////////////////////////////////////////////////////////
 
-
+	///////////////////////////////////////////////////////////////////////////
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -185,8 +194,9 @@ int main()
 
 		principleAxes->render(viewProjection);
 
+		///////////////////////////////////////////////////////////////////////////
 		/////////////////////
-		//RENDER THE GRASS
+		// GRASS MODEL
 		/////////////////////
 		grassModel = glm::translate(grassModel, glm::vec3(-10.0f, -10.0f, 0.0f));
 		grassModel = glm::rotate(grassModel, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -213,7 +223,9 @@ int main()
 		//Drawing the objects
 		glUniformMatrix4fv(glGetUniformLocation(basicShader, "model"), 1, GL_FALSE, glm::value_ptr(grassModel));
 		grass.draw(basicShader); //Draw the plane
+		///////////////////////////////////////////////////////////////////////////
 
+		///////////////////////////////////////////////////////////////////////////
 		//////////////////
 		// RUBIK CUBE
 		//////////////////
@@ -224,19 +236,23 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(basicShader, "model"), 1, GL_FALSE, glm::value_ptr(rubikModel));
 		rubik.draw(basicShader);
 		
-		
 		glUseProgram(0);
-
+		///////////////////////////////////////////////////////////////////////////
 		
+
+		///////////////////////////////////////////////////////////////////////////
+		// MOON MODEL
+		///////////////////////////////////////////////////////////////////////////
 		moon = glm::translate(moon, glm::vec3(20.0f, 0.0f, -15.0f));
-		moon = glm::rotate(moon, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		moon = glm::scale(moon, glm::vec3(10.0f));
+		
+		moonTheta += 15.0f * float(timer.getDeltaTimeSeconds());
 
 		if (moonModel)
 		{
 			// Modelling transform
-			//glm::mat4 modelTransform = glm::rotate(glm::mat4(1.0), glm::radians(23.44f), glm::vec3(0.0, 0.0, 1.0));//Earth tilt
-			//modelTransform = glm::rotate(modelTransform, glm::radians(earthTheta), glm::vec3(0.0, 1.0, 0.0));//Earth rotation
+			moon = glm::rotate(moon, glm::radians(23.44f), glm::vec3(0.0, 0.0, 1.0));//Moon tilt
+			moon = glm::rotate(moon, glm::radians(moonTheta), glm::vec3(0.0, 1.0, 0.0));//Earth rotation
 
 			// Calculate inverse transpose of the modelling transform for correct transformation of normal vectors
 			glm::mat4 invT = glm::transpose(glm::inverse(moon));;
@@ -253,9 +269,7 @@ int main()
 			glUniformMatrix4fv(viewProjectionMatrixLocation, 1, GL_FALSE, glm::value_ptr(viewProjection));
 
 			//// Set the light direction uniform vector in world coordinates based on the Sun's position
-			//glUniform4f(lightDirectionLocation, cosf(glm::radians(sunTheta)), 0.0f, sinf(glm::radians(sunTheta)), 0.0f);
-
-			glUniform4f(lightDirectionLocation, 1.0f, 0.0f, 0.0f, 0.0f); // world coordinate space vector
+			glUniform4f(lightDirectionLocation, cosf(glm::radians(sunTheta)), 0.0f, sinf(glm::radians(sunTheta)), 0.0f);
 			glUniform4f(lightDiffuseLocation, 1.0f, 1.0f, 1.0f, 1.0f); // white diffuse light
 			glUniform4f(lightSpecularLocation, 0.5f, 0.5f, 0.5f, 1.0f); // white specular light
 			glUniform1f(lightSpecExpLocation, 10.0f); // specular exponent / falloff
@@ -267,7 +281,7 @@ int main()
 
 			glUseProgram(0);
 		}
-		
+		///////////////////////////////////////////////////////////////////////////
 
 		static const char *filterStrings[] = {
 		"No Anti-Aliasing",
@@ -308,6 +322,13 @@ void processInput(GLFWwindow *window)
 		camera.setRunSpeed(3.0);
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 		camera.setRunSpeed(1.0);
+
+	//Rotate light direction on the moon
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		sunTheta = sunTheta - 1.0f;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+		sunTheta = sunTheta + 1.0f;
+
 
 	//Switch the texture filter modes
 	/*if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)

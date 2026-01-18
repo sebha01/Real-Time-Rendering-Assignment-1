@@ -68,7 +68,7 @@ int main()
 	}
 
 	//Rendering settings
-	glfwSwapInterval(1);		// glfw enable swap interval to match screen v-sync
+	glfwSwapInterval(0);		// glfw enable swap interval to match screen v-sync 1 for vsync 0 for off
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -170,11 +170,46 @@ int main()
 	GLuint uMatSpecularCol = glGetUniformLocation(basicShader, "matSpecularColour");
 	GLuint uMatSpecularExp = glGetUniformLocation(basicShader, "matSpecularExponent");
 	///////////////////////////////////////////////////////////////////////////
+	
+	///////////////////////////////////////////////////////////////////////////
+	//FPS Counter variables
+	//Video used to create FPS counter -> https://www.youtube.com/watch?v=BA6aR_5C_BM 
+	double prevTime = 0.0;
+	double crntTime = 0.0;
+	double timeDiff = 0.0;
+	unsigned int counter = 0;
+	///////////////////////////////////////////////////////////////////////////
 
 	///////////////////////////////////////////////////////////////////////////
 	// render loop
 	while (!glfwWindowShouldClose(window))
 	{
+		//FPS counter
+		crntTime = glfwGetTime();
+		timeDiff = crntTime - prevTime;
+		counter++;
+
+		if (timeDiff >= 1.0)
+		{
+			//initialised title variable
+			std::stringstream title;
+
+			//Calculate the fps and ms per frame
+			double FPS = (1.0 / timeDiff) * counter;
+			double ms = (timeDiff / counter) * 1000;
+
+			//set the title to show the fps and ms
+			title << std::fixed << std::setprecision(2) << "30077548 Anti-Aliasing assignment\tFPS:"
+				<< FPS << "\tMs: " << ms;
+
+			//Set the new window title
+			glfwSetWindowTitle(window, title.str().c_str());
+
+			//set previous time to current time and reset counter
+			prevTime = crntTime;
+			counter = 0;
+		}
+
 		// input
 		processInput(window);
 		timer.tick();

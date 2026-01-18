@@ -21,6 +21,13 @@ double lastX = camera_settings.screenWidth / 2.0f;
 double lastY = camera_settings.screenHeight / 2.0f;
 
 int	currentAntiAliasingFilter = 0;
+static const char* filterStrings[] = {
+		"No Anti-Aliasing",
+		"Multi-Sample Anti-Aliasing",
+		"Super-Sample Anti-Aliasing",
+		"",
+		"",
+		"" };
 
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
@@ -318,13 +325,6 @@ int main()
 		}
 		///////////////////////////////////////////////////////////////////////////
 
-		static const char *filterStrings[] = {
-		"No Anti-Aliasing",
-		"Multi-Sample Anti-Aliasing",
-		"Super-Sample Anti-Aliasing",
-		"",
-		"",
-		"" };
 		textRenderer.renderText(filterStrings[currentAntiAliasingFilter], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
 
 		// glfw: swap buffers and poll events
@@ -366,9 +366,9 @@ void processInput(GLFWwindow *window)
 
 
 	//Switch the texture filter modes
-	/*if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		currentAntiAliasingFilter = 0;
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	/*if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		currentAntiAliasingFilter = 1;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		currentAntiAliasingFilter = 2;

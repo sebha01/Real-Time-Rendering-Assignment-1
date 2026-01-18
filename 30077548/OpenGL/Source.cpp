@@ -1,5 +1,35 @@
 #include "Includes.h"
 
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// 
+// TO DO 
+// 
+// 
+// TAKE EARTH SCENE CLASS FROM TUTORIAL WHERE SETTING UP FBO ON TEXTURED QUAD
+// RENAME TO SSAA as a class so that can use within the main loop
+// 
+// 
+// TAKE MAIN RENDER CODE ONLY FOR THE MODELS AND ALL THE VARIABLES AND PUT INTO ANOTHER CLASS
+// FROM HERE CAN THEN PUT IT BACK INTO THE MAIN LOOP AS:
+// 
+// IF (SSAA_enabled)
+// {
+//		SETUP FBO
+//		MAIN SCENE RENDER
+//		RENDER SSAA SCENE IN VIEWPORT INSTEAD OF SCENE CAMERA
+// }
+// ELSE
+// {
+//		RENDER THE SCENE AS NORMAL
+// }
+// 
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
 // Function prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -26,6 +56,7 @@ static const char* filterStrings[] = {
 		"Multi-Sample Anti-Aliasing x4",
 		"Super-Sample Anti-Aliasing"
 };
+bool SSAA_enabled = false;
 
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
@@ -221,12 +252,19 @@ int main()
 		{
 			case 0:
 				glDisable(GL_MULTISAMPLE);
+				SSAA_enabled = false;
 				break;
 			case 1:
 				glEnable(GL_MULTISAMPLE);
+				SSAA_enabled = false;
+				break;
+			case 3:
+				glDisable(GL_MULTISAMPLE);
+				SSAA_enabled = true;
 				break;
 			deafult:
 				glDisable(GL_MULTISAMPLE);
+				SSAA_enabled = false;
 				break;
 		}
 

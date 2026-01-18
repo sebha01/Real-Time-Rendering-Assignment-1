@@ -23,7 +23,7 @@ double lastY = camera_settings.screenHeight / 2.0f;
 int	currentAntiAliasingFilter = 0;
 static const char* filterStrings[] = {
 		"No Anti-Aliasing",
-		"Multi-Sample Anti-Aliasing",
+		"Multi-Sample Anti-Aliasing x4",
 		"Super-Sample Anti-Aliasing"
 };
 
@@ -42,7 +42,7 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	// glfw window creation
 	GLFWwindow* window = glfwCreateWindow(camera_settings.screenWidth, camera_settings.screenHeight, "30077548 Anti-Aliasing assignment", NULL, NULL);
@@ -215,6 +215,21 @@ int main()
 			counter = 0;
 		}
 
+		//Change aliasing effects, learnt how to do MSAA from https://www.youtube.com/watch?v=oHVh8htoGKw
+		//Used a switch statement to change between effects.
+		switch (currentAntiAliasingFilter)
+		{
+			case 0:
+				glDisable(GL_MULTISAMPLE);
+				break;
+			case 1:
+				glEnable(GL_MULTISAMPLE);
+				break;
+			deafult:
+				glDisable(GL_MULTISAMPLE);
+				break;
+		}
+
 		// input
 		processInput(window);
 		timer.tick();
@@ -374,12 +389,6 @@ void processInput(GLFWwindow *window)
 		currentAntiAliasingFilter = 1;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		currentAntiAliasingFilter = 2;
-	/*if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-		currentAntiAliasingFilter = 3;
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-		currentAntiAliasingFilter = 4;
-	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
-		currentAntiAliasingFilter = 5;*/
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

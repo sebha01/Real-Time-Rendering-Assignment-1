@@ -24,10 +24,8 @@ int	currentAntiAliasingFilter = 0;
 static const char* filterStrings[] = {
 		"No Anti-Aliasing",
 		"Multi-Sample Anti-Aliasing",
-		"Super-Sample Anti-Aliasing",
-		"",
-		"",
-		"" };
+		"Super-Sample Anti-Aliasing"
+};
 
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
@@ -325,7 +323,11 @@ int main()
 		}
 		///////////////////////////////////////////////////////////////////////////
 
+		//Enable blending to render the text otherwise renders as a block form
+		// disable after text rendered so that it doesn't affect the other models being rendered
+		glEnable(GL_BLEND);
 		textRenderer.renderText(filterStrings[currentAntiAliasingFilter], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+		glDisable(GL_BLEND);
 
 		// glfw: swap buffers and poll events
 		glfwSwapBuffers(window);
@@ -368,11 +370,11 @@ void processInput(GLFWwindow *window)
 	//Switch the texture filter modes
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 		currentAntiAliasingFilter = 0;
-	/*if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		currentAntiAliasingFilter = 1;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		currentAntiAliasingFilter = 2;
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+	/*if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		currentAntiAliasingFilter = 3;
 	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
 		currentAntiAliasingFilter = 4;

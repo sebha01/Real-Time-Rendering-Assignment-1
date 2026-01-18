@@ -362,9 +362,9 @@ void processInput(GLFWwindow *window)
 
 	//Rotate light direction on the moon
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		sunTheta = sunTheta - 1.0f;
+		sunTheta = sunTheta - 0.1f;
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		sunTheta = sunTheta + 1.0f;
+		sunTheta = sunTheta + 0.1f;
 
 
 	//Switch the texture filter modes

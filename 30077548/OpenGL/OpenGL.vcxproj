@@ -138,6 +138,8 @@
     <ClCompile Include="..\..\Resources\CoreStructures\TextureLoader.cpp" />
     <ClCompile Include="..\..\Resources\CoreStructures\Timer.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="SceneFBO.cpp" />
+    <ClCompile Include="SceneRenderer.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +156,8 @@
     <ClInclude Include="..\..\Resources\CoreStructures\TextureLoader.h" />
     <ClInclude Include="..\..\Resources\CoreStructures\Timer.h" />
     <ClInclude Include="Includes.h" />
+    <ClInclude Include="SceneFBO.h" />
+    <ClInclude Include="SceneRenderer.h" />
     <ClInclude Include="VertexData.h" />
   </ItemGroup>
   <ItemGroup>

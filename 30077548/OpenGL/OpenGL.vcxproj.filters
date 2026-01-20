@@ -69,6 +69,12 @@
     <ClCompile Include="..\..\Resources\CoreStructures\TextRenderer.cpp">
       <Filter>Resource Files\CoreStructures\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="SceneFBO.cpp">
+      <Filter>Resource Files\CoreStructures\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneRenderer.cpp">
+      <Filter>Resource Files\CoreStructures\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Resources\CoreStructures\Camera.h">
@@ -111,6 +117,12 @@
       <Filter>Resource Files\Additional</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Resources\CoreStructures\TextRenderer.h">
+      <Filter>Resource Files\CoreStructures\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneFBO.h">
+      <Filter>Resource Files\CoreStructures\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneRenderer.h">
       <Filter>Resource Files\CoreStructures\Headers</Filter>
     </ClInclude>
   </ItemGroup>

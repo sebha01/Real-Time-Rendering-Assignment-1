@@ -37,6 +37,7 @@ bool firstMouseInput = false;
 //Initialise componenets needed to render scene for non AA, MSAA and SSAA scene
 //SceneFBO sceneFBO;
 SceneRenderer* sceneRenderer;
+TexturedQuad *superSamplingScene = nullptr;
 
 int main()
 {
@@ -82,6 +83,7 @@ int main()
 
 	sceneRenderer->Init();
 	SceneFBO sceneFBO;
+	superSamplingScene = new TexturedQuad(sceneFBO.getSceneTexture(), true);
 
 	//Rendering settings
 	glfwSwapInterval(0);		// glfw enable swap interval to match screen v-sync 1 for vsync 0 for off
@@ -161,12 +163,18 @@ int main()
 		// input
 		processInput(window);
 		sceneRenderer->getTimer().tick();
+		glm::mat4 fullScreen = glm::scale(glm::mat4(1.0), glm::vec3(2, 2, 1));
 
 		if (SSAA_enabled)
 		{
-			//sceneFBO.BeginRender();
+			fullScreen = glm::translate(fullScreen, glm::vec3(-0.5, -0.5, 0.0));
+
+			sceneFBO.BeginRender();
 			sceneRenderer->Render();
-			//sceneFBO.EndRender();
+			sceneFBO.EndRender();
+			glDisable(GL_DEPTH_TEST);
+			superSamplingScene->render(fullScreen);
+			glEnable(GL_DEPTH_TEST);
 		}
 		else
 		{

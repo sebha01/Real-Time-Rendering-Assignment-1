@@ -1,6 +1,5 @@
 #pragma once
 #include "Includes.h"
-#include "SceneRenderer.h"
 
 class SceneFBO
 {
@@ -17,8 +16,6 @@ class SceneFBO
 
 		//Flag to indicate that the FBO is valid
 		bool fboOkay;
-
-		SceneRenderer* sceneRenderer;
 	public:
 		SceneFBO();
 		void BeginRender();

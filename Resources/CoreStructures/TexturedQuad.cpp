@@ -8,9 +8,9 @@ using namespace std;
 
 static float quadPositionArray[] = {
 
-	0.0f, 0.0f, 0.0f, 1.0f,
-	1.0f, 0.0f, 0.0f, 1.0f,
-	0.0f, 1.0f, 0.0f, 1.0f,
+	-1.0f, -1.0f, 0.0f, 1.0f,
+	1.0f, -1.0f, 0.0f, 1.0f,
+	-1.0f, 1.0f, 0.0f, 1.0f,
 	1.0f, 1.0f, 0.0f, 1.0f
 };
 

@@ -19,6 +19,6 @@ class SceneFBO
 	public:
 		SceneFBO();
 		void BeginRender();
-		void EndRender();
+		void EndRender(int windowWidth, int windowHeight);
 		GLuint getSceneTexture();
 };

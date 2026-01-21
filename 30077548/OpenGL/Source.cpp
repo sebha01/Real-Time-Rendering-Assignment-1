@@ -163,32 +163,36 @@ int main()
 		// input
 		processInput(window);
 		sceneRenderer->getTimer().tick();
-		glm::mat4 fullScreen = glm::scale(glm::mat4(1.0), glm::vec3(2, 2, 1));
 
 		if (SSAA_enabled)
 		{
-			fullScreen = glm::translate(fullScreen, glm::vec3(-0.5, -0.5, 0.0));
-
 			sceneFBO.BeginRender();
 			sceneRenderer->Render();
-			sceneFBO.EndRender();
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+			//Enable blending to render the text otherwise renders as a block form
+			// disable after text rendered so that it doesn't affect the other models being rendered
+			glEnable(GL_BLEND);
+			textRenderer.renderText(filterStrings[currentAntiAliasingFilter], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+			glDisable(GL_BLEND);
+
+			sceneFBO.EndRender(sceneRenderer->getCameraSettings().screenWidth, sceneRenderer->getCameraSettings().screenHeight);
+
 			glDisable(GL_DEPTH_TEST);
-			superSamplingScene->render(fullScreen);
+			superSamplingScene->render(glm::mat4(1.0));
 			glEnable(GL_DEPTH_TEST);
+
 		}
 		else
 		{
 			sceneRenderer->Render();
-		}
-		
-		
-		///////////////////////////////////////////////////////////////////////////
 
-		//Enable blending to render the text otherwise renders as a block form
-		// disable after text rendered so that it doesn't affect the other models being rendered
-		glEnable(GL_BLEND);
-		textRenderer.renderText(filterStrings[currentAntiAliasingFilter], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
-		glDisable(GL_BLEND);
+			//Enable blending to render the text otherwise renders as a block form
+			// disable after text rendered so that it doesn't affect the other models being rendered
+			glEnable(GL_BLEND);
+			textRenderer.renderText(filterStrings[currentAntiAliasingFilter], 15.0f, 15.0f, 1.0f, glm::vec3(1.0, 1.0f, 1.0f));
+			glDisable(GL_BLEND);
+		}
 
 		// glfw: swap buffers and poll events
 		glfwSwapBuffers(window);

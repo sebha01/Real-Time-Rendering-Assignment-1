@@ -17,8 +17,8 @@ class SceneFBO
 		//Flag to indicate that the FBO is valid
 		bool fboOkay;
 	public:
-		SceneFBO();
-		void BeginRender();
+		SceneFBO(int windowWidth, int windowHeight, int scale);
+		void BeginRender(int windowWidth, int windowHeight, int scale);
 		void EndRender(int windowWidth, int windowHeight);
 		GLuint getSceneTexture();
 };

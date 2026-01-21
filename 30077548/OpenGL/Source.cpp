@@ -39,6 +39,8 @@ bool firstMouseInput = false;
 SceneRenderer* sceneRenderer;
 TexturedQuad *superSamplingScene = nullptr;
 
+int SSAA_scale = 4;
+
 int main()
 {
 	//Initialise the scene Renderer object
@@ -82,7 +84,7 @@ int main()
 	}
 
 	sceneRenderer->Init();
-	SceneFBO sceneFBO;
+	SceneFBO sceneFBO(sceneRenderer->getCameraSettings().screenWidth, sceneRenderer->getCameraSettings().screenHeight, SSAA_scale);
 	superSamplingScene = new TexturedQuad(sceneFBO.getSceneTexture(), true);
 
 	//Rendering settings
@@ -166,7 +168,7 @@ int main()
 
 		if (SSAA_enabled)
 		{
-			sceneFBO.BeginRender();
+			sceneFBO.BeginRender(sceneRenderer->getCameraSettings().screenWidth, sceneRenderer->getCameraSettings().screenHeight, SSAA_scale);
 			sceneRenderer->Render();
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 

@@ -1,6 +1,6 @@
 #include "SceneFBO.h"
 
-SceneFBO::SceneFBO()
+SceneFBO::SceneFBO(int windowWidth, int windowHeight, int scale)
 {
 	glGenFramebuffers(1, &demoFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, demoFBO);
@@ -11,7 +11,7 @@ SceneFBO::SceneFBO()
 	//scene at render time!
 	glGenTextures(1, &fboColourTexture);
 	glBindTexture(GL_TEXTURE_2D, fboColourTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 800, 800, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, windowWidth * scale, windowHeight * scale, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -22,7 +22,7 @@ SceneFBO::SceneFBO()
 
 	glGenTextures(1, &fboDepthTexture);
 	glBindTexture(GL_TEXTURE_2D, fboDepthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, 800, 800, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, windowWidth * scale, windowHeight * scale, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -73,7 +73,7 @@ SceneFBO::SceneFBO()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void SceneFBO::BeginRender()
+void SceneFBO::BeginRender(int windowWidth, int windowHeight, int scale)
 {
 	if (!fboOkay)
 		return; // Don't render anything if the FBO was not created successfully
@@ -88,7 +88,7 @@ void SceneFBO::BeginRender()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Set viewport to specified texture size (see above)
-	glViewport(0, 0, 800, 800);
+	glViewport(0, 0, windowWidth * scale, windowHeight * scale);
 
 	//Render code to go next
 }

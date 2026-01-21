@@ -2,34 +2,11 @@
 #include "SceneFBO.h"
 #include "SceneRenderer.h"
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-// 
-// TO DO 
-// SETUP SCENE RENDERER CLASS
-// INCORPORATE SCENE RENDERER TO REMOVE BULK OF CODE IN SOURCE
-// CREATE TEXTURED QUAD READY FOR FBO CLASS TO RENDER THE SCENE
-// APPLY SCENE TO QUAD WHEN RENDERING AND HAVE QUAD FILL THE SCREEN
-// YOU HAVE A SCREENSHOT ON YOUR PHONE FOR THE FULLSCREEN STUFF
-// 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
 // Function prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-
-int	currentAntiAliasingFilter = 0;
-static const char* filterStrings[] = {
-		"No Anti-Aliasing",
-		"Multi-Sample Anti-Aliasing x4",
-		"Super-Sample Anti-Aliasing"
-};
-bool SSAA_enabled = false;
 
 //Boolean to capture first mouse input to prevent snapback bug
 bool firstMouseInput = false;
@@ -39,6 +16,13 @@ bool firstMouseInput = false;
 SceneRenderer* sceneRenderer;
 TexturedQuad *superSamplingScene = nullptr;
 
+int	currentAntiAliasingFilter = 0;
+static const char* filterStrings[] = {
+		"No Anti-Aliasing",
+		"Multi-Sample Anti-Aliasing x4",
+		"Super-Sample Anti-Aliasing"
+};
+bool SSAA_enabled = false;
 int SSAA_scale = 4;
 
 int main()

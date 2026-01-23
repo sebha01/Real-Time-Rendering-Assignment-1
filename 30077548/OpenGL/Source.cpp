@@ -128,19 +128,24 @@ int main()
 		switch (currentAntiAliasingFilter)
 		{
 			case 0:
+				//No Anti-Aliasing
 				glDisable(GL_MULTISAMPLE);
 				SSAA_enabled = false;
 				break;
 			case 1:
+				//Multi Sample Anti-Aliasing
 				glEnable(GL_MULTISAMPLE);
 				SSAA_enabled = false;
 				break;
 			case 2:
+				//Super Sample Anti-Aliasing
 				glDisable(GL_MULTISAMPLE);
 				SSAA_enabled = true;
 				//Frame buffer automatically swapped within and reset back to main swap chain
+				//no need to set frame buffer back to 0
 				break;
 			default:
+				//Default set to no anti-aliasing
 				glDisable(GL_MULTISAMPLE);
 				SSAA_enabled = false;
 				break;

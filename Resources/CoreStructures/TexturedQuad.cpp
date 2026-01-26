@@ -39,7 +39,7 @@ static float quadTextureCoordArray_v_inverted[] = {
 void TexturedQuad::loadShader() {
 
 	// setup shader for textured quad
-	GLSL_ERROR glsl_err = ShaderLoader::createShaderProgram(string("..\\..\\Resources\\CoreStructures\\shaders\\basic_texture.vert"), string("..\\..\\Resources\\CoreStructures\\Shaders\\basic_texture.frag"), &quadShader);
+	GLSL_ERROR glsl_err = ShaderLoader::createShaderProgram(string("Resources\\Shaders\\SSAA.vert"), string("Resources\\Shaders\\SSAA-Average.frag"), &quadShader);
 }
 
 
